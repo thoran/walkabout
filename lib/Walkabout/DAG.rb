@@ -1,51 +1,10 @@
 # Walkabout/DAG.rb
 # Walkabout::DAG
 
+require_relative 'Node'
+
 module Walkabout
   class DAG
-    class Node
-      @nodes = []
-
-      class << self
-        def from_edges(edges)
-          builder_nodes = {}
-          edges.each do |a, b|
-            predecessor = (builder_nodes[a] ||= self.new(a))
-            (builder_nodes[b] ||= self.new(b)).predecessors << predecessor
-          end
-          @nodes = builder_nodes.values
-        end
-
-        def complete
-          @nodes.select{|n| n.complete?}
-        end
-
-        def ready
-          @nodes.select do |n|
-            !n.complete? && n.predecessors.all?{|p| p.complete?}
-          end
-        end
-      end # class << self
-
-      attr_accessor :predecessors
-
-      def complete!
-        @complete = true
-      end
-
-      def complete?
-        @complete
-      end
-
-      private
-
-      def initialize(name, predecessors = [])
-        @name = name
-        @predecessors = predecessors
-        @complete = false
-      end
-    end
-
     class << self
       def parse(sequences)
         result = []
@@ -62,32 +21,38 @@ module Walkabout
       end
     end # class << self
 
-    def ready
-      Node.ready
-    end
-
-    def next
-      ready.first
+    def take(n = nil)
+      if n
+        ready.first(n)
+      else
+        ready.first
+      end
     end
 
     def complete?
-      Node.ready.empty?
+      ready.empty?
     end
 
     private
 
     def initialize(edges)
-      Node.from_edges(edges)
+      @nodes = build_nodes(edges)
+    end
+
+    def build_nodes(edges)
+      nodes = {}
+      edges.each do |a, b|
+        predecessor = (nodes[a] ||= Node.new(a))
+        successor = (nodes[b] ||= Node.new(b))
+        successor.predecessors << predecessor
+      end
+      nodes.values
+    end
+
+    def ready
+      @nodes.select do |n|
+        !n.complete? && n.predecessors.all?(&:complete?)
+      end
     end
   end
 end
-
-sequences = [
-  [:a, :b, :c],
-  [:d, :b, :e],
-  [:f, :g]
-]
-
-dag = Walkabout::DAG.parse(sequences)
-node = dag.next
-node.complete!
