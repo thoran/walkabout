@@ -1,0 +1,9 @@
+# TODO
+
+1. A taken or running state, so that take(n) can hand out a batch to be run in parallel without handing it out again.
+2. DAG#add_node, so that a node with no edges can be represented; DAG#add_edge, so that a DAG can be built in stages.
+3. Readers: DAG#nodes and DAG#edges.
+4. Node#successors, alongside Node#predecessors.
+5. Transitive predecessors and successors, so that a walk can be restricted to the nodes affected by a change to one.
+6. A hook for merging nodes of the same name, so that a subclass carrying more than a name need not override initialize and ready.
+7. A directed graph which may have cycles and grows as it is walked: nodes and edges added mid-walk, a walk breadth-first or depth-first from a start node visiting each node once, and edges carrying a kind. Wants 2-4 first.

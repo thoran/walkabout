@@ -1,0 +1,40 @@
+# walkabout/CHANGELOG
+
+## 20261024
+
+0.3.0: + cycle detection; + walkabout(.rb).gemspec
+
+1. + lib/walkabout.rb
+2. + lib/Walkabout/CycleError.rb: CycleError#nodes, the nodes on a cycle, or on a path between two
+3. ~ DAG#initialize: + check_for_cycles, raising CycleError. A cycle left none of its nodes ever ready, so complete? was true with them not done.
+4. + DAG#cyclic_nodes, + DAG#nodes_with_predecessor_and_successor_among
+5. ~ DAG.parse: flat_map, rather than map for its side effect
+6. ~ DAG.parse_sequence: each_cons(2).to_a
+7. + lib/Walkabout/VERSION.rb
+8. + test/Walkabout/DAG_test.rb, + test/Walkabout/Node_test.rb
+9. + walkabout.gemspec, + walkabout.rb.gemspec: the same gem published under both names
+10. + Rakefile, + README.md, + CHANGELOG, + LICENSE, + TODO
+
+
+## 20260428
+
+0.2.0: /Walkabout::DAG::Node/Walkabout::Node/; nodes held per DAG; /DAG#next/DAG#take/
+
+1. + lib/Walkabout/Node.rb: Node, out of DAG, + Node#name
+2. ~ DAG#initialize: nodes held in @nodes, rather than on the Node class, so that more than one DAG may exist at once
+3. /DAG#next/DAG#take/: take(n) hands out up to n ready nodes
+4. ~ DAG#ready: private
+5. - lib/Walkabout/DAG.rb: the example
+
+
+## 20260423
+
+0.1.0: + Walkabout::DAG::Node; + DAG#ready, #next, #complete?
+
+1. + DAG::Node: predecessors, complete!, complete?
+2. ~ DAG.parse: returns a DAG, rather than the edges
+3. ~ lib/Walkabout/DAG.rb: the example takes the next node and completes it
+
+0.0.0: + Walkabout::DAG.parse
+
+1. + lib/Walkabout/DAG.rb: DAG.parse, and an example of it parsing three sequences
