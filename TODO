@@ -1,8 +1,21 @@
 # TODO
 
-1. A taken or running state, so that take(n) can hand out a batch to be run in parallel without handing it out again.
-2. DAG#add_node, so that a node with no edges can be represented; DAG#add_edge, so that a DAG can be built in stages.
-3. Readers: DAG#nodes and DAG#edges.
-4. Node#successors, alongside Node#predecessors, so that a walk can go from a node to what depends on it as well as to what it depends on.
-5. Transitive predecessors and successors, so that a walk can be restricted to the nodes affected by a change to one.
-6. A hook for merging nodes of the same name, so that a subclass carrying more than a name need not override initialize and ready.
+## 0.3.1
+
+1. DAG: de-duplicate predecessors, so that DAG.parse([[:a, :b], [:a, :b, :c]]) gives :b the predecessor :a once rather than twice.
+2. DAG#cyclic_nodes in linear time: trimming forward from the nodes with no predecessors and back from those with no successors, leaving the nodes on a cycle, or on a path between two, as now.
+
+## 0.4.0
+
+3. Digraph: built from edges, and with add_node and add_edge; nodes and edges; predecessors and successors; attributes on nodes and edges.
+
+## Digraph, after 0.4.0
+
+4. each_node and each_edge.
+5. In- and out-degree.
+6. A filtered subgraph.
+
+## DAG
+
+7. A taken or running state, so that take(n) can hand out a batch to be run in parallel without handing it out again.
+8. A hook for merging nodes of the same name, so that a subclass carrying more than a name need not override initialize and ready.
