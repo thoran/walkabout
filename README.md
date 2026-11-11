@@ -40,7 +40,8 @@ dag = Walkabout::DAG.parse([
 ```
 
 Nodes are made from the names in the edges, and so a node appears only where it
-is in at least one edge.
+is in at least one edge, or is the one member of a sequence. An edge given more
+than once is held once.
 
 ### Walking it
 

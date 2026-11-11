@@ -1,5 +1,20 @@
 # walkabout/CHANGELOG
 
+## 20261110
+
+0.3.1: ~ DAG: An edge given twice is held once, a sequence of one member makes a node, and cycles are found in linear time.
+
+1. ~ DAG#build_nodes: Each edge is taken once, by edges.uniq. Duplicates made a node's predecessors wrong for anything reading them.
+2. ~ DAG#build_nodes: An edge of one member makes its node alone.
+3. ~ DAG.parse_sequence: A sequence of one member is an edge of one, rather than nothing. Its node was dropped.
+4. ~ DAG#cyclic_nodes: Trims forward from the nodes with no predecessor, then back from those with no successor, in linear time, rather than rescanning every node until nothing more goes.
+5. + DAG#trim
+6. - DAG#nodes_with_predecessor_and_successor_among
+7. ~ lib/Walkabout/VERSION.rb: /0.3.0/0.3.1/
+8. ~ test/Walkabout/DAG_test.rb: An edge given twice, a sequence of one member, an empty sequence, and a path between two cycles are tested.
+9. ~ README.md: A sequence of one member makes a node, and an edge given twice is held once.
+
+
 ## 20261024
 
 0.3.0: + cycle detection; + walkabout(.rb).gemspec
