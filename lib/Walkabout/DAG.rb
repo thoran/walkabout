@@ -14,7 +14,11 @@ module Walkabout
       private
 
       def parse_sequence(sequence)
-        sequence.each_cons(2).to_a
+        if sequence.size == 1
+          [sequence]
+        else
+          sequence.each_cons(2).to_a
+        end
       end
     end # class << self
 
@@ -39,8 +43,10 @@ module Walkabout
 
     def build_nodes(edges)
       nodes = {}
-      edges.each do |a, b|
+      edges.uniq.each do |edge|
+        a, b = edge
         predecessor = (nodes[a] ||= Node.new(a))
+        next if edge.size == 1
         successor = (nodes[b] ||= Node.new(b))
         successor.predecessors << predecessor
       end
@@ -52,21 +58,32 @@ module Walkabout
       raise CycleError.new(nodes) unless nodes.empty?
     end
 
-    # Trims, until nothing more goes, every node with no predecessor or no
-    # successor left among those remaining. Only nodes on a cycle, or on a path
-    # between two, survive.
+    # Trims forward from the nodes with no predecessor, then back from those
+    # left with no successor. Only nodes on a cycle, or on a path between two,
+    # survive.
     def cyclic_nodes
-      nodes = @nodes
-      while (trimmed = nodes_with_predecessor_and_successor_among(nodes)) != nodes
-        nodes = trimmed
-      end
-      nodes
+      predecessors = @nodes.to_h{|node| [node, node.predecessors]}
+      successors = @nodes.to_h{|node| [node, []]}
+      @nodes.each{|node| node.predecessors.each{|p| successors[p] << node}}
+      trim(trim(@nodes, predecessors, successors), successors, predecessors)
     end
 
-    def nodes_with_predecessor_and_successor_among(nodes)
-      nodes.select do |node|
-        node.predecessors.any?{|p| nodes.include?(p)} && nodes.any?{|n| n.predecessors.include?(node)}
+    # Removes each node with nothing inward of it among those remaining, until
+    # none is left to remove.
+    def trim(nodes, inward, outward)
+      remaining = nodes.to_h{|node| [node, true]}
+      counts = nodes.to_h{|node| [node, inward[node].count{|n| remaining[n]}]}
+      queue = nodes.select{|node| counts[node].zero?}
+      until queue.empty?
+        node = queue.shift
+        remaining.delete(node)
+        outward[node].each do |n|
+          next unless remaining[n]
+          counts[n] -= 1
+          queue << n if counts[n].zero?
+        end
       end
+      nodes.select{|node| remaining[node]}
     end
 
     def ready

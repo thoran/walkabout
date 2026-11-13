@@ -15,6 +15,22 @@ describe Walkabout::DAG do
       _(names(dag.take(5))).must_equal [:a, :d]
     end
 
+    it 'gives a predecessor once where an edge is given twice' do
+      dag = Walkabout::DAG.parse([[:a, :b], [:a, :b, :c]])
+      dag.take.complete!
+      _(names(dag.take.predecessors)).must_equal [:a]
+    end
+
+    it 'makes a node of a sequence with one member' do
+      dag = Walkabout::DAG.parse([[:a], [:b, :c]])
+      _(names(dag.take(5))).must_equal [:a, :b]
+    end
+
+    it 'makes no node of an empty sequence' do
+      dag = Walkabout::DAG.parse([[], [:a, :b]])
+      _(names(dag.take(5))).must_equal [:a]
+    end
+
     it 'joins sequences at the members they share' do
       dag = Walkabout::DAG.parse([[:a, :b], [:c, :b]])
       dag.take.complete!
@@ -78,6 +94,11 @@ describe Walkabout::DAG do
       error = _{Walkabout::DAG.parse([[:x, :a, :b, :c, :a], [:c, :y]])}.must_raise Walkabout::CycleError
       _(names(error.nodes).sort).must_equal [:a, :b, :c]
       _(error.message).must_equal 'cycle among: a, b, c'
+    end
+
+    it 'names the nodes on a path between two cycles' do
+      error = _{Walkabout::DAG.parse([[:a, :b, :a], [:b, :c, :d, :c]])}.must_raise Walkabout::CycleError
+      _(names(error.nodes).sort).must_equal [:a, :b, :c, :d]
     end
 
     it 'does not raise where paths diverge and rejoin' do
